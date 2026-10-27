@@ -1,2 +1,108 @@
 # math-lecture-standard
-Math lecture &amp; page standard: 13 rules, 4-step pipeline, five-gate validation, self-contained KaTeX HTML
+
+把「数学怎么讲才算讲透」这件事，从口头要求固化成一条可执行的流水线。
+
+> 一句话：**每次讲数学、每建或改一张数学页，先读这份再动手。**
+
+---
+
+## 它解决什么
+
+跟 AI 学数学最常见的失败方式，是它给你一份**看起来很对但读不进去**的推导：
+
+- 一上来就甩公式，不告诉你这题在考什么
+- 证明绕一圈，同一个条件用了两次却不点破
+- 该画图的地方只写文字，几何直观全靠你自己想
+- 公式只给结果，不讲「为什么长这样」
+- 讲完没有自测，你不知道自己到底会不会
+
+这份标准就是针对这五条的反面清单。它不教你数学，它约束的是**讲解的形状**。
+
+---
+
+## 铁律 13 条（R1–R13）
+
+完整条文见 [`SKILL.md`](SKILL.md) 第一节，这里只列骨架：
+
+| 编号 | 规则 |
+|---|---|
+| R1 | **四件套**：讲定理/工具必给「直觉 + 小微例 + 何时用 + 连接」，讲完附自测清单 |
+| R2 | **先思路后公式**：开头一句话点明「这题在考什么、为什么这么做」 |
+| R3 | **证明步递进不绕圈**：每步必须推出新信息；同一条件用两次要点破「一因两果」 |
+| R4 | **主动排雷车轱辘话**：跨题共用的知识点显式标注「这是某题的逆 / 倒装」 |
+| R5 | **反例构造讲清怎么挑**：不能凭空冒出一个数列 |
+| R6 | **数形结合是硬性**：凡能画图的**必须配 SVG**，图文并茂 |
+| R7 | **公式要形象推导**：核心公式必须讲「为什么长这样」，不能只列结果 |
+| R8 | **讲细 + 公式要全**：基本表、两类换元、分部、部分分式，不省略中间步 |
+| R9–R13 | 编号体系、坑表、交付话术、资产地图、开源注意（见 SKILL.md） |
+
+---
+
+## 出页流水线（四步）
+
+1. **定载体** —— 先决定是逐题详解 / 聚焦讲评 / 定理速通 / 公式速查
+2. **搭生成器** —— 从 [`references/page-skeleton.md`](references/page-skeleton.md) 的骨架起手，**不手写 HTML**
+3. **五关校验** —— 跑 [`scripts/validate_math_page.py`](scripts/validate_math_page.py)，一关不过不许交付
+4. **交付** —— 页面放工作区，同时**把核心讲解贴进回复正文**（写了文件不等于交付）
+
+### 五关校验
+
+```bash
+python scripts/validate_math_page.py 页面.html              # 静态四关
+python scripts/validate_math_page.py 页面.html --headless   # 追加无头渲染关
+python scripts/validate_math_page.py 页面.html --expect 226 # 断言公式节点数
+```
+
+退出码 `0` 全过 / `1` 有问题。任何一关 FAIL 都不许交付。
+
+---
+
+## 安装
+
+把整个目录放进你的 skill 目录即可：
+
+```bash
+# WorkBuddy
+cp -r math-lecture-standard ~/.workbuddy/skills/
+
+# 其他支持 SKILL.md 的 Agent
+cp -r math-lecture-standard <你的 skills 目录>/
+```
+
+无外部依赖。`validate_math_page.py` 只用标准库；`--headless` 那关需要本机有 Edge 或 Chrome。
+
+---
+
+## 目录结构
+
+```
+math-lecture-standard/
+├── SKILL.md                        # 主文件：13 条铁律 + 流水线 + 坑表 + 交付话术
+├── README.md                       # 本文件
+├── references/
+│   └── page-skeleton.md            # 可直接复制的页面生成器骨架
+└── scripts/
+    └── validate_math_page.py       # 五关校验脚本
+```
+
+---
+
+## 适用 / 不适用
+
+**适用**：高数、线代、概率统计、竞赛数学的逐题讲解与页面产出；公式库建设；练习批改对照。
+
+**不适用**：它不是数学教材，不含题库，也不做任何自动解题。它只约束「讲成什么样」。
+
+---
+
+## 关于隐私
+
+这份标准诞生于一个真实的学习场景，公开前已系统性脱敏：
+学号、姓名、学校、班级、本地路径、考试名称一律移除或泛化。
+`SKILL.md` 第七节保留了一份完整的开源检查清单，供同类 skill 复用。
+
+---
+
+## License
+
+MIT
