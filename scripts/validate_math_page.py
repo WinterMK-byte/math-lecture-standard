@@ -75,6 +75,21 @@ def static_checks(path):
     ids = set(re.findall(r'id="([\w\-]+)"', txt))
     missing = sorted({t for t in toc if t not in ids and t != "top"})
 
+    # ⑥ 标题：外壳模板是 2018卷_题目版_做题用.html，漏改会让浏览器标签页继承它的 <title>
+    m_t = re.search(r"<title>(.*?)</title>", txt, re.S)
+    m_h = re.search(r"<h1[^>]*>(.*?)</h1>", txt, re.S)
+    title = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", m_t.group(1))).strip() if m_t else ""
+    h1 = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", m_h.group(1))).strip() if m_h else ""
+    tpl_title = "2018 期中 A 卷 · 题目版（做题用）"
+    if not title:
+        t_ok, t_note = False, "缺 <title>"
+    elif title == tpl_title:
+        t_ok, t_note = False, "仍是外壳模板的标题，必须改写"
+    elif h1 and title != h1:
+        t_ok, t_note = False, "与 h1 不一致：title=%r h1=%r" % (title, h1)
+    else:
+        t_ok, t_note = True, title
+
     rows = [
         ("① BOM", bombs == 1, "%d 个（应为 1）" % bombs),
         ("② 标签", len(p.err) == 0 and len(p.stack) == 0,
@@ -82,6 +97,7 @@ def static_checks(path):
         ("③ 公式字符", len(bare) == 0, "裸尖括号片段=%d %s" % (len(bare), bare[:2])),
         ("③' 替换符", "\ufffd" not in txt, "U+FFFD=%d" % txt.count("\ufffd")),
         ("④ 目录锚点", len(missing) == 0, "toc=%d 缺失=%s" % (len(set(toc)), missing[:5])),
+        ("⑥ 标题", t_ok, t_note),
     ]
     for name, ok, detail in rows:
         print("%-10s %s  %s" % (name, "PASS" if ok else "FAIL", detail))
